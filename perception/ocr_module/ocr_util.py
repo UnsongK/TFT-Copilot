@@ -1,11 +1,18 @@
 import os
+import paddle
 from paddleocr import PaddleOCR
 
 
 class OCRUtil:
-    def __init__(self, lang='ch'):
-        # paddleocr 3.4 自动检测GPU，无需use_gpu参数
-        self.ocr = PaddleOCR(use_textline_orientation=True, lang=lang)
+    def __init__(self, lang='ch', use_gpu=True, gpu_id=0):
+        # 明确设置为使用 GPU（如果可用），并将 use_gpu 传递给 PaddleOCR
+        if use_gpu:
+            try:
+                paddle.set_device(f'gpu:{gpu_id}')
+            except Exception:
+                # 如果设置设备失败（例如无 GPU），继续使用默认设备
+                pass
+        self.ocr = PaddleOCR(use_textline_orientation=True, lang=lang, use_gpu=use_gpu)
 
     def recognize_text(self, image_path):
         '''
